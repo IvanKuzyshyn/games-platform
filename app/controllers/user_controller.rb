@@ -1,10 +1,7 @@
 class UserController < ApplicationController
   def index
-    users = User.first
+    users = User.find_by({name: "Ivan"})
 
     render json: users
-  end
-
-  def find
   end
 end
