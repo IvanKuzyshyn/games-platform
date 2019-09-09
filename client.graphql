@@ -1,0 +1,5 @@
+type Game {
+    id: Int!
+    name: String!
+    title: String!
+}
