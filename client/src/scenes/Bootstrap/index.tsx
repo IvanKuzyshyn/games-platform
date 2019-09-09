@@ -1,23 +1,56 @@
-import React, { useContext, FunctionComponent } from "react";
+import React from "react";
+import { Router } from '@reach/router'
+import { useQuery } from 'react-apollo-hooks'
+import { gql } from 'apollo-boost'
 
-import { AppContext } from "../../context/application";
 import { SignScreen } from "../Sign";
+import { GameLauncher } from "../GameLauncher";
+import { GamesList } from "../GamesList";
+import { NotFound } from "../NotFound";
+import { TopBar } from "../TopBar";
+import { Leaderboard } from "../Leaderboard";
 
-interface Props {
-    onUserAuthorize: (user: any) => void,
-}
+const GET_AUTH_USER = gql`
+    {
+        authUser @client {
+            id,
+            name,
+        }
+    }
+`;
 
-const Bootstrap: FunctionComponent<Props> = (props: Props) => {
-    const { onUserAuthorize } = props;
-    const { user } = useContext(AppContext);
 
-    if (user) {
+const Bootstrap = () => {
+    const { data, error, loading } = useQuery(GET_AUTH_USER);
+
+    if (loading) {
+        return <h1>LOADING...</h1>
+    }
+
+    if (error) {
+        return <pre>{error.message}</pre>
+    }
+
+    if (data.authUser) {
         return (
-            <div><h1>WE HAVE USER!!!</h1></div>
+            <>
+                <TopBar />
+                <Router>
+                    <NotFound default />
+                    <GamesList path="/" />
+                    <GameLauncher path="/game/:name" userId={data.authUser.id} />
+                    <Leaderboard path="/leaderboard" />
+                </Router>
+            </>
         )
     }
 
-    return <SignScreen onUserAuthorize={onUserAuthorize} />
+    return (
+        <Router>
+            <NotFound default />
+            <SignScreen path="/" />
+        </Router>
+    );
 };
 
 export { Bootstrap }

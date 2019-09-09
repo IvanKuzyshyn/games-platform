@@ -2,10 +2,6 @@ import React, { useState, ChangeEvent } from 'react'
 import { useApolloClient } from 'react-apollo-hooks'
 import { gql } from 'apollo-boost'
 
-interface Props {
-    onUserAuthorize: (user: any) => void,
-}
-
 const FIND_USER_BY_NAME = gql`
     query User($name: String!) {
         user(name: $name) {
@@ -29,8 +25,9 @@ const CREATE_USER_WITH_NAME = gql`
     }
 `;
 
-const SignForm = (props: Props) => {
-    const { onUserAuthorize } = props
+
+
+const SignForm = () => {
     const [name, setName] = useState('');
     const client = useApolloClient();
 
@@ -43,11 +40,17 @@ const SignForm = (props: Props) => {
         if (!data.user) {
             const { data, errors } =  await client.mutate({
                 mutation: CREATE_USER_WITH_NAME,
-                variables: { name }
-            })
+                variables: { name }, // TODO update
+            });
+
+            client.writeData({
+                data: { authUser: data.createUser.user }
+            });
         }
 
-        onUserAuthorize(data.user)
+        client.writeData({
+            data: { authUser: data.user }
+        });
     }
 
     function handleChangeName(event: ChangeEvent<HTMLInputElement>) {
@@ -56,7 +59,7 @@ const SignForm = (props: Props) => {
         setName(value)
     }
 
-    function handleSubmit(event: any) {
+    function handleSubmit() {
         if (!name) {
             return
         }

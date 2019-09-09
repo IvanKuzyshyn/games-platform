@@ -1,19 +1,12 @@
 import React from 'react';
+import { RouteComponentProps } from '@reach/router';
 
 import SignForm from './components/SignForm'
 
-interface Props {
-    onUserAuthorize: (user: any) => void,
-}
-
-const SignScreen = (props: Props): React.FunctionComponentElement<any> => {
-    console.log('PROPS', props);
-
-    return (
-        <div>
-            <SignForm onUserAuthorize={props.onUserAuthorize} />
-        </div>
-    )
-};
+const SignScreen = (props: RouteComponentProps) => (
+    <div>
+        <SignForm />
+    </div>
+);
 
 export { SignScreen }
